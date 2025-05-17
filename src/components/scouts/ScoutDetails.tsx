@@ -60,7 +60,16 @@ const ScoutDetails = ({ scoutId, open, onOpenChange }: ScoutDetailsProps) => {
         .single();
       
       if (scoutError) throw scoutError;
-      setScout(scoutData);
+      
+      // Type assertion to ensure status is valid
+      const validStatus = ['active', 'suspended', 'graduated'].includes(scoutData.status) 
+        ? scoutData.status as 'active' | 'suspended' | 'graduated'
+        : 'active'; // Default to active if invalid status
+        
+      setScout({
+        ...scoutData,
+        status: validStatus
+      });
       
       // Fetch activities with attendance status
       const { data: attendanceData, error: attendanceError } = await supabase
