@@ -10,6 +10,7 @@ import Activities from "./pages/Activities";
 import Attendance from "./pages/Attendance";
 import Communications from "./pages/Communications";
 import Settings from "./pages/Settings";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/activities" element={<Activities />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/communications" element={<Communications />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
