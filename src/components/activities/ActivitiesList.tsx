@@ -117,7 +117,7 @@ const ActivitiesList = () => {
             <SelectValue placeholder="Filter by type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All types</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             <SelectItem value="hiking">Hiking</SelectItem>
             <SelectItem value="training">Training</SelectItem>
             <SelectItem value="service">Service</SelectItem>
