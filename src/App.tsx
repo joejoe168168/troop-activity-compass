@@ -1,7 +1,6 @@
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -19,24 +18,22 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/scouts" element={<Scouts />} />
-          <Route path="/activities" element={<Activities />} />
-          <Route path="/attendance" element={<Attendance />} />
-          <Route path="/communications" element={<Communications />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/locations" element={<Locations />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/scouts" element={<Scouts />} />
+        <Route path="/activities" element={<Activities />} />
+        <Route path="/attendance" element={<Attendance />} />
+        <Route path="/communications" element={<Communications />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/locations" element={<Locations />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
