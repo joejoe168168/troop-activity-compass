@@ -3,17 +3,17 @@ import React from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 interface ActivityCardProps {
   activity: {
     id: string;
     title: string;
-    date: Date;
+    date: string;
     time: string;
     location: string;
-    type: 'hiking' | 'training' | 'service' | 'other';
-    description?: string;
+    type: string;
+    description?: string | null;
     capacity?: number | null;
   };
   onViewDetails: (id: string) => void;
@@ -37,7 +37,7 @@ const ActivityCard = ({ activity, onViewDetails }: ActivityCardProps) => {
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm text-muted-foreground">
             <Calendar className="h-4 w-4 mr-2" />
-            <span>{format(activity.date, 'MMMM d, yyyy')} • {activity.time}</span>
+            <span>{format(parseISO(activity.date), 'MMMM d, yyyy')} • {activity.time}</span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <MapPin className="h-4 w-4 mr-2" />
