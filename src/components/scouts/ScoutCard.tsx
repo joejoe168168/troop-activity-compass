@@ -39,7 +39,12 @@ const ScoutCard = ({ scout, onViewDetails }: ScoutCardProps) => {
           `}>
             {scout.status.charAt(0).toUpperCase() + scout.status.slice(1)}
           </Badge>
-          <Button variant="ghost" size="icon">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => onViewDetails(scout.id)}
+            title="Edit Scout"
+          >
             <Edit className="h-4 w-4" />
           </Button>
         </div>
@@ -48,7 +53,7 @@ const ScoutCard = ({ scout, onViewDetails }: ScoutCardProps) => {
         <Button variant="ghost" className="text-xs" onClick={() => onViewDetails(scout.id)}>
           View Details
         </Button>
-        <Button variant="ghost" className="text-xs">
+        <Button variant="ghost" className="text-xs" onClick={() => onViewDetails(scout.id)}>
           Activity History
         </Button>
       </CardFooter>

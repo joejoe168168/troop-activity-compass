@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import ScoutCard from "./ScoutCard";
+import ScoutDetails from "./ScoutDetails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
@@ -29,7 +30,9 @@ const ScoutsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [scouts, setScouts] = useState<Scout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [selectedScoutId, setSelectedScoutId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [newScout, setNewScout] = useState({
     name: "",
     age: "",
@@ -74,7 +77,8 @@ const ScoutsList = () => {
   }, []);
 
   const handleViewDetails = (id: string) => {
-    console.log(`View details for scout ${id}`);
+    setSelectedScoutId(id);
+    setDetailsOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,7 +110,7 @@ const ScoutsList = () => {
       if (error) throw error;
       
       toast.success("Scout added successfully");
-      setOpen(false);
+      setCreateDialogOpen(false);
       setNewScout({
         name: "",
         age: "",
@@ -132,7 +136,7 @@ const ScoutsList = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-scout-green-dark">Scouts</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-scout-green hover:bg-scout-green-dark">
               <Plus className="mr-2 h-4 w-4" /> Add Scout
@@ -267,6 +271,13 @@ const ScoutsList = () => {
           )}
         </>
       )}
+
+      {/* Scout Details Dialog */}
+      <ScoutDetails 
+        scoutId={selectedScoutId}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
     </div>
   );
 };

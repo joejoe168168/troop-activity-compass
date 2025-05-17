@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, Search } from "lucide-react";
 import ActivityCard from "./ActivityCard";
+import ActivityDetails from "./ActivityDetails";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -42,7 +44,9 @@ const ActivitiesList = () => {
   const [activityType, setActivityType] = useState<string>("all");
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   
   const [newActivity, setNewActivity] = useState({
     title: "",
@@ -80,7 +84,8 @@ const ActivitiesList = () => {
   }, []);
 
   const handleViewDetails = (id: string) => {
-    console.log(`View details for activity ${id}`);
+    setSelectedActivityId(id);
+    setDetailsOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -112,7 +117,7 @@ const ActivitiesList = () => {
       if (error) throw error;
       
       toast.success("Activity created successfully");
-      setOpen(false);
+      setCreateDialogOpen(false);
       setNewActivity({
         title: "",
         description: "",
@@ -142,7 +147,7 @@ const ActivitiesList = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-scout-green-dark">Activities</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-scout-green hover:bg-scout-green-dark">
               <Plus className="mr-2 h-4 w-4" /> Create Activity
@@ -296,6 +301,13 @@ const ActivitiesList = () => {
           )}
         </>
       )}
+      
+      {/* Activity Details Dialog */}
+      <ActivityDetails 
+        activityId={selectedActivityId}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
     </div>
   );
 };
