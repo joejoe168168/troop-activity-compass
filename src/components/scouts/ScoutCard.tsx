@@ -10,7 +10,7 @@ interface ScoutCardProps {
     id: string;
     name: string;
     age: number;
-    group: string;
+    group_name: string;
     status: 'active' | 'suspended' | 'graduated';
   };
   onViewDetails: (id: string) => void;
@@ -27,7 +27,7 @@ const ScoutCard = ({ scout, onViewDetails }: ScoutCardProps) => {
           <div className="ml-4">
             <h3 className="font-semibold text-lg">{scout.name}</h3>
             <p className="text-muted-foreground text-sm">
-              Age: {scout.age} • {scout.group}
+              Age: {scout.age} • {scout.group_name}
             </p>
           </div>
         </div>

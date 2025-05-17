@@ -1,37 +1,55 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ScoutCard from "./ScoutCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Scout {
   id: string;
   name: string;
   age: number;
-  group: string;
+  group_name: string;
   status: 'active' | 'suspended' | 'graduated';
 }
 
-const dummyScouts: Scout[] = [
-  { id: "1", name: "Alex Johnson", age: 12, group: "Wolf Patrol", status: "active" },
-  { id: "2", name: "Sam Williams", age: 14, group: "Eagle Patrol", status: "active" },
-  { id: "3", name: "Jordan Smith", age: 13, group: "Fox Patrol", status: "suspended" },
-  { id: "4", name: "Taylor Brown", age: 15, group: "Bear Patrol", status: "active" },
-  { id: "5", name: "Casey Davis", age: 16, group: "Eagle Patrol", status: "graduated" },
-  { id: "6", name: "Riley Wilson", age: 12, group: "Wolf Patrol", status: "active" },
-];
-
 const ScoutsList = () => {
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [scouts, setScouts] = useState<Scout[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchScouts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('scouts')
+          .select('*');
+        
+        if (error) {
+          throw error;
+        }
+
+        setScouts(data || []);
+      } catch (error) {
+        console.error("Error fetching scouts:", error);
+        toast.error("Failed to load scouts");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScouts();
+  }, []);
 
   const handleViewDetails = (id: string) => {
     console.log(`View details for scout ${id}`);
   };
 
-  const filteredScouts = dummyScouts.filter(scout => 
+  const filteredScouts = scouts.filter(scout => 
     scout.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    scout.group.toLowerCase().includes(searchTerm.toLowerCase())
+    scout.group_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -53,20 +71,28 @@ const ScoutsList = () => {
         />
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredScouts.map((scout) => (
-          <ScoutCard
-            key={scout.id}
-            scout={scout}
-            onViewDetails={handleViewDetails}
-          />
-        ))}
-      </div>
-      
-      {filteredScouts.length === 0 && (
-        <div className="text-center p-10 border border-dashed rounded-lg">
-          <p className="text-muted-foreground">No scouts found matching your search criteria</p>
+      {loading ? (
+        <div className="text-center p-10">
+          <p>Loading scouts...</p>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredScouts.map((scout) => (
+              <ScoutCard
+                key={scout.id}
+                scout={scout}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </div>
+          
+          {filteredScouts.length === 0 && (
+            <div className="text-center p-10 border border-dashed rounded-lg">
+              <p className="text-muted-foreground">No scouts found matching your search criteria</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

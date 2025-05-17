@@ -9,6 +9,90 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      activities: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          date: string
+          description: string | null
+          id: string
+          location: string
+          time: string
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          location: string
+          time: string
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          location?: string
+          time?: string
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      attendance: {
+        Row: {
+          activity_id: string
+          id: string
+          notes: string | null
+          recorded_at: string | null
+          scout_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          activity_id: string
+          id?: string
+          notes?: string | null
+          recorded_at?: string | null
+          scout_id: string
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          activity_id?: string
+          id?: string
+          notes?: string | null
+          recorded_at?: string | null
+          scout_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_scout_id_fkey"
+            columns: ["scout_id"]
+            isOneToOne: false
+            referencedRelation: "scouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           dateadded: number
@@ -213,6 +297,51 @@ export type Database = {
         }
         Relationships: []
       }
+      rsvp: {
+        Row: {
+          activity_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          scout_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          scout_id: string
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          scout_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rsvp_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rsvp_scout_id_fkey"
+            columns: ["scout_id"]
+            isOneToOne: false
+            referencedRelation: "scouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       runway_estimates: {
         Row: {
           average_burn_rate: number
@@ -262,6 +391,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scouts: {
+        Row: {
+          age: number
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          group_name: string
+          id: string
+          join_date: string | null
+          name: string
+          parent_guardian_name: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          age: number
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          group_name: string
+          id?: string
+          join_date?: string | null
+          name: string
+          parent_guardian_name?: string | null
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          age?: number
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          group_name?: string
+          id?: string
+          join_date?: string | null
+          name?: string
+          parent_guardian_name?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
