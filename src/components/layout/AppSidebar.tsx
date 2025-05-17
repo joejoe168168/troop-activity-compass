@@ -23,9 +23,12 @@ import {
 } from "@/components/ui/sidebar";
 
 const AppSidebar = () => {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  
+  // Use state to determine if collapsed
+  const collapsed = state === "collapsed";
 
   const menuItems = [
     { title: "Dashboard", url: "/", icon: Activity },
@@ -46,12 +49,12 @@ const AppSidebar = () => {
   return (
     <Sidebar
       className={`border-r ${collapsed ? "w-14" : "w-64"} transition-all duration-300`}
-      collapsible
+      collapsible="icon"
     >
       <SidebarTrigger className="m-2 self-end" />
 
       <SidebarContent className="pt-4">
-        <SidebarGroup defaultOpen={true} open={isMainExpanded}>
+        <SidebarGroup>
           <SidebarGroupLabel>Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

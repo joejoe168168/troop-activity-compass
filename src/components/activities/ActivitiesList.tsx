@@ -78,7 +78,7 @@ const dummyActivities: Activity[] = [
 
 const ActivitiesList = () => {
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [activityType, setActivityType] = React.useState<string>("");
+  const [activityType, setActivityType] = React.useState<string>("all");
 
   const handleViewDetails = (id: string) => {
     console.log(`View details for activity ${id}`);
@@ -90,7 +90,7 @@ const ActivitiesList = () => {
       activity.location.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .filter(activity => 
-      activityType === "" || activity.type === activityType
+      activityType === "all" || activity.type === activityType
     );
 
   return (
