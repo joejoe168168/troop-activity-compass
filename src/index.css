@@ -1,11 +1,12 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 120 15% 98%;
+    --foreground: 120 10% 10%;
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -13,13 +14,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 142 40% 40%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 39 38% 60%;
+    --secondary-foreground: 39 30% 10%;
 
-    --muted: 210 40% 96.1%;
+    --muted: 110 10% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
     --accent: 210 40% 96.1%;
@@ -28,65 +29,59 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 120 5% 90%;
+    --input: 120 5% 90%;
+    --ring: 142 40% 40%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 120 25% 15%;
+    --sidebar-foreground: 120 5% 95%;
+    --sidebar-primary: 142 40% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 120 15% 20%;
+    --sidebar-accent-foreground: 120 5% 95%;
+    --sidebar-border: 120 10% 20%;
+    --sidebar-ring: 142 40% 40%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 120 15% 10%;
+    --foreground: 120 10% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 120 10% 15%;
+    --card-foreground: 120 5% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 120 10% 15%;
+    --popover-foreground: 120 5% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 142 40% 40%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 39 38% 40%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 120 5% 20%;
+    --muted-foreground: 120 5% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 120 10% 20%;
+    --accent-foreground: 120 5% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 120 5% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 120 10% 20%;
+    --input: 120 10% 20%;
+    --ring: 142 40% 40%;
+
+    --sidebar-background: 120 25% 12%;
+    --sidebar-foreground: 120 5% 95%;
+    --sidebar-primary: 142 40% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 120 15% 17%;
+    --sidebar-accent-foreground: 120 5% 95%;
+    --sidebar-border: 120 10% 17%;
+    --sidebar-ring: 142 40% 40%;
   }
 }
 
@@ -97,5 +92,31 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .scout-card {
+    @apply bg-white rounded-lg shadow-md border border-scout-green/20 hover:shadow-lg transition-shadow duration-300;
+  }
+  
+  .dashboard-stat {
+    @apply p-6 rounded-lg;
+  }
+  
+  .activity-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  
+  .activity-badge-hiking {
+    @apply bg-scout-green/20 text-scout-green-dark;
+  }
+  
+  .activity-badge-training {
+    @apply bg-scout-blue/20 text-scout-blue-dark;
+  }
+  
+  .activity-badge-service {
+    @apply bg-scout-brown/20 text-scout-brown-dark;
   }
 }
