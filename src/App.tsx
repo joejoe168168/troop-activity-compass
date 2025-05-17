@@ -11,6 +11,8 @@ import Attendance from "./pages/Attendance";
 import Communications from "./pages/Communications";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
+import Reports from "./pages/Reports";
+import Locations from "./pages/Locations";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/activities" element={<Activities />} />
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/communications" element={<Communications />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/locations" element={<Locations />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />

@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +6,46 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, Users, FileText, Settings, Lock, UserPlus, Database, Key } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [userSettingsOpen, setUserSettingsOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState({ name: '', role: '' });
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    role: 'Parent'
+  });
+
+  const handleAddUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    // This would connect to Supabase Auth in a real implementation
+    toast.success(`User invitation sent to ${newUser.email}`);
+    setUserDialogOpen(false);
+    setNewUser({
+      name: '',
+      email: '',
+      role: 'Parent'
+    });
+  };
+
+  const handleUserSettings = (name: string, role: string) => {
+    setCurrentUser({ name, role });
+    setUserSettingsOpen(true);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -98,10 +135,105 @@ const AdminDashboard = () => {
                     <CardTitle>User Management</CardTitle>
                     <CardDescription>Manage system users and their access</CardDescription>
                   </div>
-                  <Button className="gap-1">
-                    <UserPlus className="h-4 w-4" />
-                    Add User
-                  </Button>
+                  
+                  <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="gap-1">
+                        <UserPlus className="h-4 w-4" />
+                        Add User
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New User</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleAddUser}>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="name" className="text-right">Name</Label>
+                            <Input 
+                              id="name"
+                              value={newUser.name}
+                              onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                              className="col-span-3"
+                              required
+                            />
+                          </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="email" className="text-right">Email</Label>
+                            <Input 
+                              id="email" 
+                              type="email"
+                              value={newUser.email}
+                              onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                              className="col-span-3"
+                              required
+                            />
+                          </div>
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="role" className="text-right">Role</Label>
+                            <Select 
+                              value={newUser.role}
+                              onValueChange={(value) => setNewUser({...newUser, role: value})}
+                            >
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a role" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Administrator">Administrator</SelectItem>
+                                <SelectItem value="Leader">Scout Leader</SelectItem>
+                                <SelectItem value="Parent">Parent</SelectItem>
+                                <SelectItem value="Committee">Committee Member</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button type="submit">Send Invitation</Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                  
+                  <Dialog open={userSettingsOpen} onOpenChange={setUserSettingsOpen}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>User Settings: {currentUser.name}</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label className="text-right">Current Role</Label>
+                          <div className="col-span-3">
+                            <span className="font-medium">{currentUser.role}</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="newRole" className="text-right">New Role</Label>
+                          <Select defaultValue={currentUser.role}>
+                            <SelectTrigger className="col-span-3">
+                              <SelectValue placeholder="Select a role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Administrator">Administrator</SelectItem>
+                              <SelectItem value="Leader">Scout Leader</SelectItem>
+                              <SelectItem value="Parent">Parent</SelectItem>
+                              <SelectItem value="Committee">Committee Member</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2 mt-2">
+                          <Button variant="outline" className="w-full">Reset Password</Button>
+                          <Button variant="destructive" className="w-full">Deactivate User</Button>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button onClick={() => {
+                          toast.success(`User ${currentUser.name} updated`);
+                          setUserSettingsOpen(false);
+                        }}>Save Changes</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
@@ -131,7 +263,14 @@ const AdminDashboard = () => {
                           </div>
                           <div className="text-muted-foreground">{i === 0 ? 'Just now' : `${i} day${i > 1 ? 's' : ''} ago`}</div>
                         </div>
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleUserSettings(
+                            user, 
+                            i === 0 ? 'Administrator' : i === 1 ? 'Leader' : i === 2 ? 'Parent' : 'Committee'
+                          )}
+                        >
                           <Settings className="h-4 w-4" />
                         </Button>
                       </div>

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +11,18 @@ import {
 } from "@/components/ui/select";
 import { Plus, Search } from "lucide-react";
 import ActivityCard from "./ActivityCard";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Activity {
   id: string;
@@ -19,72 +31,108 @@ interface Activity {
   time: string;
   location: string;
   type: 'hiking' | 'training' | 'service' | 'other';
-  attendees: number;
   description: string;
+  capacity: number | null;
 }
 
-const dummyActivities: Activity[] = [
-  {
-    id: "1",
-    title: "Weekend Hiking Trip",
-    date: new Date(2025, 5, 25),
-    time: "8:00 AM",
-    location: "Mountain Trail Park",
-    type: "hiking",
-    attendees: 15,
-    description: "A day-long hiking trip to explore the northern trails. Bring water, lunch, and appropriate hiking gear."
-  },
-  {
-    id: "2",
-    title: "First Aid Training",
-    date: new Date(2025, 5, 18),
-    time: "4:00 PM",
-    location: "Scout Hall",
-    type: "training",
-    attendees: 22,
-    description: "Basic first aid training session with practical exercises. This is mandatory for all scouts aiming for the safety badge."
-  },
-  {
-    id: "3",
-    title: "Community Garden Cleanup",
-    date: new Date(2025, 5, 20),
-    time: "10:00 AM",
-    location: "Community Garden",
-    type: "service",
-    attendees: 12,
-    description: "Help clean and prepare the community garden for summer planting. Tools will be provided."
-  },
-  {
-    id: "4",
-    title: "Knot Tying Workshop",
-    date: new Date(2025, 5, 22),
-    time: "6:00 PM",
-    location: "Scout Hall",
-    type: "training",
-    attendees: 18,
-    description: "Learn essential knots and rope skills for camping and climbing activities."
-  },
-  {
-    id: "5",
-    title: "Overnight Camping Trip",
-    date: new Date(2025, 6, 5),
-    time: "2:00 PM",
-    location: "Lakeside Campground",
-    type: "hiking",
-    attendees: 25,
-    description: "Weekend camping trip with activities including swimming, hiking, and campfire cooking. Permission slips required."
-  }
-];
-
 const ActivitiesList = () => {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [activityType, setActivityType] = React.useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activityType, setActivityType] = useState<string>("all");
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  
+  const [newActivity, setNewActivity] = useState({
+    title: "",
+    description: "",
+    date: "",
+    time: "",
+    location: "",
+    type: "hiking" as 'hiking' | 'training' | 'service' | 'other',
+    capacity: ""
+  });
+
+  const fetchActivities = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*');
+      
+      if (error) {
+        throw error;
+      }
+
+      // Transform the data to match our interface
+      const formattedActivities = data.map(activity => ({
+        ...activity,
+        date: new Date(activity.date)
+      }));
+
+      setActivities(formattedActivities);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      toast.error("Failed to load activities");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivities();
+  }, []);
 
   const handleViewDetails = (id: string) => {
     console.log(`View details for activity ${id}`);
   };
 
-  const filteredActivities = dummyActivities
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewActivity(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (value: string, field: string) => {
+    setNewActivity(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const { data, error } = await supabase
+        .from('activities')
+        .insert({
+          title: newActivity.title,
+          description: newActivity.description,
+          date: new Date(newActivity.date).toISOString(),
+          time: newActivity.time,
+          location: newActivity.location,
+          type: newActivity.type,
+          capacity: newActivity.capacity ? parseInt(newActivity.capacity) : null
+        })
+        .select();
+      
+      if (error) throw error;
+      
+      toast.success("Activity created successfully");
+      setOpen(false);
+      setNewActivity({
+        title: "",
+        description: "",
+        date: "",
+        time: "",
+        location: "",
+        type: "hiking",
+        capacity: ""
+      });
+      fetchActivities();
+    } catch (error) {
+      console.error("Error creating activity:", error);
+      toast.error("Failed to create activity");
+    }
+  };
+
+  const filteredActivities = activities
     .filter(activity => 
       activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       activity.location.toLowerCase().includes(searchTerm.toLowerCase())
@@ -97,9 +145,111 @@ const ActivitiesList = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-scout-green-dark">Activities</h2>
-        <Button className="bg-scout-green hover:bg-scout-green-dark">
-          <Plus className="mr-2 h-4 w-4" /> Create Activity
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-scout-green hover:bg-scout-green-dark">
+              <Plus className="mr-2 h-4 w-4" /> Create Activity
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[550px]">
+            <DialogHeader>
+              <DialogTitle>Create New Activity</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="title" className="text-right">Title</Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    value={newActivity.title}
+                    onChange={handleInputChange}
+                    className="col-span-3"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="description" className="text-right">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={newActivity.description}
+                    onChange={handleInputChange}
+                    className="col-span-3"
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="date" className="text-right">Date</Label>
+                  <Input
+                    id="date"
+                    name="date"
+                    type="date"
+                    value={newActivity.date}
+                    onChange={handleInputChange}
+                    className="col-span-3"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="time" className="text-right">Time</Label>
+                  <Input
+                    id="time"
+                    name="time"
+                    type="time"
+                    value={newActivity.time}
+                    onChange={handleInputChange}
+                    className="col-span-3"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="location" className="text-right">Location</Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    value={newActivity.location}
+                    onChange={handleInputChange}
+                    className="col-span-3"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="type" className="text-right">Type</Label>
+                  <Select 
+                    value={newActivity.type} 
+                    onValueChange={(value) => handleSelectChange(value, 'type')}
+                  >
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hiking">Hiking</SelectItem>
+                      <SelectItem value="training">Training</SelectItem>
+                      <SelectItem value="service">Service</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="capacity" className="text-right">Capacity</Label>
+                  <Input
+                    id="capacity"
+                    name="capacity"
+                    type="number"
+                    value={newActivity.capacity}
+                    onChange={handleInputChange}
+                    className="col-span-3"
+                    placeholder="Optional"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Create Activity</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -126,20 +276,28 @@ const ActivitiesList = () => {
         </Select>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredActivities.map((activity) => (
-          <ActivityCard
-            key={activity.id}
-            activity={activity}
-            onViewDetails={handleViewDetails}
-          />
-        ))}
-      </div>
-      
-      {filteredActivities.length === 0 && (
-        <div className="text-center p-10 border border-dashed rounded-lg">
-          <p className="text-muted-foreground">No activities found matching your search criteria</p>
+      {loading ? (
+        <div className="text-center p-10">
+          <p>Loading activities...</p>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredActivities.map((activity) => (
+              <ActivityCard
+                key={activity.id}
+                activity={activity}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </div>
+          
+          {filteredActivities.length === 0 && (
+            <div className="text-center p-10 border border-dashed rounded-lg">
+              <p className="text-muted-foreground">No activities found matching your search criteria</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
