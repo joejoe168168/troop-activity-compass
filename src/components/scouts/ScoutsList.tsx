@@ -31,7 +31,16 @@ const ScoutsList = () => {
           throw error;
         }
 
-        setScouts(data || []);
+        // Cast the data to ensure the status is of the correct type
+        const typedScouts = data?.map(scout => ({
+          id: scout.id,
+          name: scout.name,
+          age: scout.age,
+          group_name: scout.group_name,
+          status: scout.status as 'active' | 'suspended' | 'graduated'
+        })) || [];
+
+        setScouts(typedScouts);
       } catch (error) {
         console.error("Error fetching scouts:", error);
         toast.error("Failed to load scouts");
