@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,15 +23,18 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+// Updated to match the data structure from Supabase
 interface Activity {
   id: string;
   title: string;
-  date: Date;
+  date: string; // Changed from Date to string to match Supabase
   time: string;
   location: string;
-  type: 'hiking' | 'training' | 'service' | 'other';
-  description: string;
+  type: string; // Changed from union type to string to match Supabase
+  description: string | null;
   capacity: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 const ActivitiesList = () => {
@@ -63,13 +65,8 @@ const ActivitiesList = () => {
         throw error;
       }
 
-      // Transform the data to match our interface
-      const formattedActivities = data.map(activity => ({
-        ...activity,
-        date: new Date(activity.date)
-      }));
-
-      setActivities(formattedActivities);
+      // No need to transform date objects now as we're storing them as strings
+      setActivities(data as Activity[]);
     } catch (error) {
       console.error("Error fetching activities:", error);
       toast.error("Failed to load activities");
@@ -104,7 +101,7 @@ const ActivitiesList = () => {
         .insert({
           title: newActivity.title,
           description: newActivity.description,
-          date: new Date(newActivity.date).toISOString(),
+          date: newActivity.date, // Store as ISO string
           time: newActivity.time,
           location: newActivity.location,
           type: newActivity.type,

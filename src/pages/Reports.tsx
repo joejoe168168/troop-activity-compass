@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,8 +18,14 @@ interface Scout {
 interface Activity {
   id: string;
   title: string;
-  date: Date;
+  date: string;
   type: string;
+  capacity?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  location: string;
+  time: string;
+  description?: string | null;
 }
 
 interface Attendance {
@@ -106,20 +111,29 @@ const Reports = () => {
         );
         
         // Process attendance by recent activities (last 5)
-        const recentActivities = activitiesData
-          .sort((a: Activity, b: Activity) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        // Sort activities by date in descending order
+        const recentActivities = [...activitiesData]
+          .sort((a: Activity, b: Activity) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          })
           .slice(0, 5);
         
         const attendanceStats: Record<string, { present: number, absent: number, excused: number }> = {};
         
-        recentActivities.forEach((activity: any) => {
+        recentActivities.forEach((activity: Activity) => {
           attendanceStats[activity.title] = { present: 0, absent: 0, excused: 0 };
         });
         
         attendanceData.forEach((record: Attendance) => {
-          const activity = activitiesData.find((a: any) => a.id === record.activity_id);
+          const activity = activitiesData.find((a: Activity) => a.id === record.activity_id);
           if (activity && attendanceStats[activity.title]) {
-            attendanceStats[activity.title][record.status as keyof typeof attendanceStats[string]]++;
+            if (record.status === 'present') {
+              attendanceStats[activity.title].present++;
+            } else if (record.status === 'absent') {
+              attendanceStats[activity.title].absent++;
+            } else if (record.status === 'excused') {
+              attendanceStats[activity.title].excused++;
+            }
           }
         });
         
